@@ -81,11 +81,15 @@ layout: default
     });
     pwd.on("init", function () {
       pwd.terms.forEach((term) => {
+        const url = new URL(pwd.opts.baseUrl);
         var list = document.getElementsByClassName("language-" + term.selector);
         for (var i = 0, len = list.length; i < len; ++i) {
-          const url = new URL(pwd.opts.baseUrl);
-          console.log(url);
           list[i].innerText = list[i].innerText.replaceAll('[[pwd_protocol]]', url.protocol)
+            .replaceAll('[[pwd_host]]', url.host);
+        }
+        var list = document.getElementsByTagName("a");
+        for (var i = 0, len = list.length; i < len; ++i) {
+          list[i].href = list[i].href.replaceAll('[[pwd_protocol]]', url.protocol)
             .replaceAll('[[pwd_host]]', url.host);
         }
       });
@@ -96,6 +100,11 @@ layout: default
         var list = document.getElementsByClassName("language-" + term.selector);
         for (var i = 0, len = list.length; i < len; ++i) {
           list[i].innerText = list[i].innerText.replaceAll('[[' + pwd.terms[id].name + '_proxy_host]]', e.proxy_host)
+            .replaceAll('[[' + pwd.terms[id].name + '_ip]]', e.ip);
+        }
+        var list = document.getElementsByTagName("a");
+        for (var i = 0, len = list.length; i < len; ++i) {
+          list[i].href = list[i].href.replaceAll('[[' + pwd.terms[id].name + '_proxy_host]]', e.proxy_host)
             .replaceAll('[[' + pwd.terms[id].name + '_ip]]', e.ip);
         }
       });
