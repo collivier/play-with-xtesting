@@ -16,8 +16,10 @@ layout: compress
 
     {{ content }}
 
+{% if site.url == 'https://training.play-with-docker.com' %}
     {% include footer.html %}
-    
+{% endif %}
+
 <script async>
     (function() {
         var font = document.createElement('link'); 

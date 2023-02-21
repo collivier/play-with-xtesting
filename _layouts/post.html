@@ -21,7 +21,9 @@ layout: default
                 {{ content }}
             </div>
         </article>
+{% if site.url == 'https://training.play-with-docker.com' %}
         {% include social-share.html %}
+{% endif %}
     </div>
 
     {% if terms > 0 %}

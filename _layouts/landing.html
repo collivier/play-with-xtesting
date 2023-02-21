@@ -15,9 +15,12 @@ layout: default
         </div>
 
       </article>
+{% if site.url == 'https://training.play-with-docker.com' %}
       {% include social-share.html %}
+{% endif %}
     </div>
-    
+{% if site.url == 'https://training.play-with-docker.com' %}
     {% include sidebar.html %}
+{% endif %}
   </div>
 </div>
