@@ -79,6 +79,27 @@ layout: default
         resizeHeight: false,
         onDragEnd: pwd.resize.bind(pwd)
     });
+    pwd.on("init", function () {
+      pwd.terms.forEach((term) => {
+        var list = document.getElementsByClassName("language-" + term.selector);
+        for (var i = 0, len = list.length; i < len; ++i) {
+          const url = new URL(pwd.opts.baseUrl);
+          console.log(url);
+          list[i].innerText = list[i].innerText.replaceAll('[[pwd_protocol]]', url.protocol)
+            .replaceAll('[[pwd_host]]', url.host);
+        }
+      });
+    });
+    pwd.on("instanceCreate", function (e) {
+      var id = Number(e.hostname.match(/node(\d{1,})/)[1]) - 1;
+      pwd.terms.forEach((term) => {
+        var list = document.getElementsByClassName("language-" + term.selector);
+        for (var i = 0, len = list.length; i < len; ++i) {
+          list[i].innerText = list[i].innerText.replaceAll('[[' + pwd.terms[id].name + '_proxy_host]]', e.proxy_host)
+            .replaceAll('[[' + pwd.terms[id].name + '_ip]]', e.ip);
+        }
+      });
+    })
     window.onbeforeunload = function(e) {
         navigator.sendBeacon("{{site.pwdurl}}/sessions/" + pwd.sessionId + "/close");
         return;
