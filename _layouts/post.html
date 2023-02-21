@@ -52,7 +52,7 @@ layout: default
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="https://rawgit.com/RickStrahl/jquery-resizable/master/dist/jquery-resizable.min.js"></script>
-<script src="https://cdn.rawgit.com/play-with-docker/sdk/74a853bbc404ce08c091a4b2c6f1de52df0da933/dist/pwd.js"></script>
+<script src="https://unpkg.com/pwd-sdk@0.0.12/dist/pwd.js"></script>
 <script src="{{site.baseurl}}/js/quiz.js"></script>
 <script>
     var siteUrl = "{{ site.url }}"
@@ -72,6 +72,7 @@ layout: default
           console.log('In _config.yml, the site url does not match the url you are serving from, so no analytics were pushed.')
       }
     {% endif %}
+    pwd = new PWD()
     pwd.newSession([{selector: '.term1'}, {selector: '.term2'}, {selector: '.term3'}], {baseUrl: '{{site.pwdurl}}', ImageName: '{{page.image}}'});
     $(".panel-left").resizable({
         handleSelector: ".splitter",
