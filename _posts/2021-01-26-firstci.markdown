@@ -1,0 +1,131 @@
+---
+layout: post
+title:  "Deploy your first Continuous Integration toolchain"
+date:   2021-01-26
+author: "@collivier"
+categories: beginner
+terms: 1
+---
+
+In this scenario, you will smoothly deploy and configure a Continuous
+Integration toolchain to run the Xtesting samples. All the test results will be
+published in your own test result database and all the test artificats in your
+own s3 repository. A statuspage will quickly highlight the overall results.
+
+More XtestingCI-based playbooks can be found at
+[https://github.com/collivier/ansible-role-xtesting](https://github.com/collivier/ansible-role-xtesting)
+
+## Xtesting and XtestingCI in a nutshell
+
+Xtesting is a simple framework to assemble sparse test cases and to accelerate
+the adoption of automation best practices. It mainly allows the
+tester/developer to work only on the test suites without diving into
+[Continuous Integration](https://en.wikipedia.org/wiki/Continuous_integration)
+which would require additional skills. By managing all the interactions
+with the toolchain components, Xtesting guarantees a uniq and simple way to
+execute the test case, to publish all test results in a common test result
+database and to share all test reports in a common artifact repository.
+
+XtestingCI leverages the common test case execution proposed by Xtesting.
+Thanks to a simple test case list, this tool deploys anywhere plug-and-play
+Continuous Integration toolchains in a few commands. It supports multiple
+opensource components such as [Jenkins](https://www.jenkins.io/) and
+[Gitlab CI/CD](https://docs.gitlab.com/ee/ci/) and multiple deployment models
+such as all-in-one (in Docker or in Kubernetes), centralized services (e.g.
+[OPNFV](https://www.opnfv.org) toolchain) or a mix of both.
+
+During this scenario, you will deploy your own clone of the
+[OPNFV](https://www.opnfv.org) toolchain which has been in-use every day to
+verify [OpenStack](https://www.openstack.org/) and
+[Kubernetes](https://kubernetes.io) deployments for 5 years. But from a tester
+state point, switching from Jenkins to Gitlab CI/CD becomes as simple as
+writing 2 Boolean values in a text file via XtestingCI.
+
+## Installation
+
+XtestingCI is an Ansible role published in Ansible Galaxy and then asks for
+Ansible already available in your environment. It must be executed by a user
+part of the sudo group (or by root as in Katacoda) due to a couple of admin
+tasks.
+
+Be free to install XtestingCI in a Python virtualenv or via a dedicated user
+in your local environment if needed as explained in the
+[homepage](https://github.com/collivier/ansible-role-xtesting)
+
+The next commands simply install Ansible, download
+XtestingCI and all the mandatory Ansible collections.
+
+```.term1
+apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general \
+    community.grafana kubernetes.core community.docker community.postgresql
+```
+
+## Deployment
+
+XtestingCI only asks for an Ansible playbook which is mostly the test case list
+you want to execute (Docker and test case names). It could be any test case
+leveraging Xtesting such as the ones offered by OPNFV Functest, the collection
+of state-of-the-art virtual infrastructure test suites.
+
+For the purpose of this scenario, you simply download the Xtesting sample list:
+
+```.term1
+git clone https://gerrit.opnfv.org/gerrit/functest-xtesting functest-xtesting-src
+```
+
+The playground forces us to precise both test database and test artifact urls to
+make them reachable from your device:
+
+```.term1
+cat << EOF >> functest-xtesting-src/ansible/site.yml
+      http_dst_url: [[pwd_protocol]]//[[.term1_proxy_host]]-8181.direct.[[pwd_host]]
+      testapi_ext_url: [[pwd_protocol]]//[[.term1_proxy_host]]-8000.direct.[[pwd_host]]/api/v1
+EOF
+```
+
+You could have a quick look to the playbook. It lists all the samples included
+in the 2 Xtesting containers in suites: opnfv/xtesting and opnfv/xtesting-mts
+
+```.term1
+cat functest-xtesting-src/ansible/site.yml
+```
+
+You can now deploy your own Continuous Integration toolchain:
+
+```.term1
+ansible-playbook functest-xtesting-src/ansible/site.yml
+```
+
+The play ends after 5 minutes. Once the final Ansible message is printed,
+Jenkins is accessible
+[here](//[[.term1_proxy_host]]-8080.direct.[[pwd_host]]){:target="_blank"}.
+
+## Play
+
+You can identify yourself as admin to be allowed to trigger a build:
+- login: admin
+- password: admin
+
+The default Jenkins view lists all the Jenkins jobs. You can easily find your
+main job, xtesting-latest-daily, via the Jenkins view named xtesting.
+
+You're ready to start a new build of xtesting-latest-daily without changing the
+default parameters.
+
+The samples are all executed after 1 minute and all the test outputs are
+accessible via the console icons. If you open the
+xtesting-opnfv-xtesting-latest-fifth-run one for instance, you will first read:
+- the test output highlighting its status
+- a link to the test database where its results are stored
+- a couple of links to its artifacts automatically published
+
+A zip file dumping all test campaign data is printed in the xtesting-latest-zip
+console.
+
+You may also access the status page highlighting the overall status of your
+system under tests (SUT). To do so, simply click
+[here](//[[.term1_proxy_host]]-8001.direct.[[pwd_host]]){:target="_blank"}.
+
+That's all folks!
